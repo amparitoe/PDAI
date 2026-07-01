@@ -1,20 +1,15 @@
-window.onload = async function(){
+window.onload = async () => {
 
-    try{
+    try {
 
-        await cargarExcel();
+        await cargarPlanificacion();
 
         console.log(baseDatos);
 
-        alert("Planificación cargada.\n\nRegistros encontrados: "+baseDatos.length);
+    } catch (e) {
 
-    }
-    catch(error){
-
-        console.error(error);
-
-        alert(error.message);
+        alert(e.message);
 
     }
 
-}
+};
