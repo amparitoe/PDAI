@@ -1,109 +1,111 @@
-// ===============================================
-// SIPE
-// Lector de la planificación
-// ===============================================
+// ===============================
+// SIPE - Motor de lectura Excel
+// ===============================
 
 let baseDatos = [];
 
-const actividadesExcluir = [
+const ignorar = [
     "VACACIONES",
+    "PERMISO",
     "CURSO",
     "CAPACITACIÓN",
     "CAPACITACION",
-    "PERMISO",
     "FERIADO",
-    "REUNIÓN",
-    "REUNION",
     "IAAC",
     "ILAC",
-    "LICENCIA"
+    "REUNIÓN",
+    "REUNION",
+    "LICENCIA",
+    "DESCANSO",
+    "0"
 ];
 
 async function cargarExcel(){
 
     baseDatos=[];
 
-    const response=await fetch("datos/planificacion.xlsx");
+    const response = await fetch("datos/planificacion.xlsx");
 
-    const buffer=await response.arrayBuffer();
+    if(!response.ok){
+        throw new Error("No se pudo abrir el archivo Excel.");
+    }
 
-    const workbook=XLSX.read(buffer,{
+    const buffer = await response.arrayBuffer();
+
+    const workbook = XLSX.read(buffer,{
         type:"array"
     });
 
     workbook.SheetNames.forEach(nombreHoja=>{
 
-        const hoja=workbook.Sheets[nombreHoja];
-
-        const datos=XLSX.utils.sheet_to_json(hoja,{
-            header:1,
-            defval:""
-        });
-
-        procesarHoja(nombreHoja,datos);
+        leerHoja(nombreHoja,workbook.Sheets[nombreHoja]);
 
     });
 
-    console.log(baseDatos);
-
 }
 
-function procesarHoja(mes,datos){
+function leerHoja(nombreHoja,hoja){
 
+    const datos = XLSX.utils.sheet_to_json(hoja,{
+        header:1,
+        defval:""
+    });
+
+    // fila donde empiezan los evaluadores
     for(let fila=4;fila<datos.length;fila++){
 
-        const evaluador=datos[fila][1];
+        let evaluador=datos[fila][1];
 
         if(!evaluador) continue;
 
+        evaluador=evaluador.toString().trim();
+
         for(let columna=4;columna<datos[fila].length;columna++){
 
-            let valor=datos[fila][columna];
+            let actividad=datos[fila][columna];
 
-            if(valor===0) continue;
+            if(!actividad) continue;
 
-            if(valor==="") continue;
+            actividad=actividad.toString().trim();
 
-            valor=String(valor).trim();
+            if(actividad=="") continue;
 
-            if(valor==="0") continue;
+            if(ignorar.includes(actividad.toUpperCase())) continue;
 
-            if(esActividadExcluir(valor)) continue;
-
-            const dia=datos[2][columna];
+            let dia=datos[2][columna];
 
             if(!dia) continue;
 
             let tipo="EVALUACIÓN";
-            let oi=valor;
+            let oi=actividad;
 
-            if(valor.toUpperCase().startsWith("TEST.")){
+            if(actividad.toUpperCase().startsWith("TEST.")){
 
                 tipo="TESTIFICACIÓN";
 
-                oi=valor.replace(/TEST\./i,"").trim();
+                oi=actividad.substring(5).trim();
 
             }
 
-            if(valor.toUpperCase().startsWith("POSIBLE TEST.")){
+            if(actividad.toUpperCase().startsWith("POSIBLE TEST.")){
 
                 tipo="POSIBLE TESTIFICACIÓN";
 
-                oi=valor.replace(/POSIBLE TEST\./i,"").trim();
+                oi=actividad.substring(14).trim();
 
             }
 
             baseDatos.push({
 
-                mes,
+                mes:nombreHoja,
 
-                dia,
+                dia:dia,
 
-                evaluador,
+                evaluador:evaluador,
 
-                tipo,
+                tipo:tipo,
 
-                oi
+                oi:oi
 
             });
 
@@ -112,13 +114,3 @@ function procesarHoja(mes,datos){
     }
 
 }
-
-function esActividadExcluir(texto){
-
-    texto=texto.toUpperCase();
-
-    return actividadesExcluir.some(palabra=>texto.includes(palabra));
-
-}
-
-cargarExcel();
