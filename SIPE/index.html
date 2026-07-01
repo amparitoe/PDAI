@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>SIPE - Sistema Integral de Planificación de Evaluaciones</title>
+
+    <link rel="stylesheet" href="css/estilos.css">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Iconos -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<nav class="navbar navbar-dark bg-primary shadow">
+
+<div class="container">
+
+<span class="navbar-brand mb-0 h1">
+
+<i class="bi bi-calendar-check"></i>
+
+SIPE
+
+</span>
+
+</div>
+
+</nav>
+
+
+<div class="container mt-4">
+
+<div class="card shadow">
+
+<div class="card-header bg-primary text-white">
+
+<h4 class="mb-0">
+
+Sistema Integral de Planificación de Evaluaciones
+
+</h4>
+
+</div>
+
+<div class="card-body">
+
+<div class="row">
+
+<div class="col-md-3">
+
+<label class="form-label">
+
+Mes
+
+</label>
+
+<select
+id="mes"
+class="form-select">
+
+<option value="">Todos</option>
+
+<option>ENERO</option>
+<option>FEBRERO</option>
+<option>MARZO</option>
+<option>ABRIL</option>
+<option>MAYO</option>
+<option>JUNIO</option>
+<option>JULIO</option>
+<option>AGOSTO</option>
+<option>SEPTIEMBRE</option>
+<option>OCTUBRE</option>
+<option>NOVIEMBRE</option>
+<option>DICIEMBRE</option>
+
+</select>
+
+</div>
+
+<div class="col-md-6">
+
+<label class="form-label">
+
+Evaluador
+
+</label>
+
+<input
+
+id="evaluador"
+
+type="text"
+
+class="form-control"
+
+placeholder="Escriba el nombre del evaluador">
+
+</div>
+
+<div class="col-md-3 d-grid">
+
+<label class="form-label">
+
+&nbsp;
+
+</label>
+
+<button
+
+id="btnBuscar"
+
+class="btn btn-primary">
+
+<i class="bi bi-search"></i>
+
+Buscar
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card mt-4 shadow">
+
+<div class="card-header">
+
+Resultados
+
+</div>
+
+<div class="card-body">
+
+<table
+class="table table-striped"
+id="tablaResultados">
+
+<thead>
+
+<tr>
+
+<th>Fecha</th>
+
+<th>Mes</th>
+
+<th>Evaluador</th>
+
+<th>Actividad</th>
+
+<th>OI</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td colspan="5" class="text-center">
+
+No existen resultados.
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<script src="js/excel.js"></script>
+
+<script src="js/buscador.js"></script>
+
+<script src="js/app.js"></script>
+
+</body>
+
+</html>
