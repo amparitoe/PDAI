@@ -1,10 +1,11 @@
-// ===============================
-// SIPE - Motor de lectura Excel
-// ===============================
+// ============================================
+// SIPE
+// Lectura del archivo Excel
+// ============================================
 
 let baseDatos = [];
 
-const ignorar = [
+const EXCLUIR = [
     "VACACIONES",
     "PERMISO",
     "CURSO",
@@ -20,92 +21,97 @@ const ignorar = [
     "0"
 ];
 
-async function cargarExcel(){
+async function cargarPlanificacion() {
 
-    baseDatos=[];
+    baseDatos = [];
 
-    const response = await fetch("datos/planificacion.xlsx");
+    const respuesta = await fetch("datos/planificacion.xlsx");
 
-    if(!response.ok){
-        throw new Error("No se pudo abrir el archivo Excel.");
+    if (!respuesta.ok) {
+        throw new Error("No se encontró datos/planificacion.xlsx");
     }
 
-    const buffer = await response.arrayBuffer();
+    const buffer = await respuesta.arrayBuffer();
 
-    const workbook = XLSX.read(buffer,{
-        type:"array"
+    const libro = XLSX.read(buffer, {
+        type: "array"
     });
 
-    workbook.SheetNames.forEach(nombreHoja=>{
+    libro.SheetNames.forEach(nombreHoja => {
 
-        leerHoja(nombreHoja,workbook.Sheets[nombreHoja]);
+        const hoja = libro.Sheets[nombreHoja];
+
+        const datos = XLSX.utils.sheet_to_json(hoja, {
+            header: 1,
+            defval: ""
+        });
+
+        leerHoja(nombreHoja, datos);
 
     });
+
+    console.log("Registros encontrados:", baseDatos.length);
 
 }
 
-function leerHoja(nombreHoja,hoja){
+function leerHoja(mes, datos) {
 
-    const datos = XLSX.utils.sheet_to_json(hoja,{
-        header:1,
-        defval:""
-    });
+    // Fila donde empiezan los evaluadores
+    for (let fila = 4; fila < datos.length; fila++) {
 
-    // fila donde empiezan los evaluadores
-    for(let fila=4;fila<datos.length;fila++){
+        let evaluador = datos[fila][1];
 
-        let evaluador=datos[fila][1];
+        if (!evaluador) continue;
 
-        if(!evaluador) continue;
+        evaluador = evaluador.toString().trim();
 
-        evaluador=evaluador.toString().trim();
+        // Columnas donde están los días
+        for (let columna = 4; columna < datos[fila].length; columna++) {
 
-        for(let columna=4;columna<datos[fila].length;columna++){
+            let actividad = datos[fila][columna];
 
-            let actividad=datos[fila][columna];
+            if (!actividad) continue;
 
-            if(!actividad) continue;
+            actividad = actividad.toString().trim();
 
-            actividad=actividad.toString().trim();
+            if (actividad === "") continue;
 
-            if(actividad=="") continue;
+            if (EXCLUIR.includes(actividad.toUpperCase())) continue;
 
-            if(ignorar.includes(actividad.toUpperCase())) continue;
+            let dia = datos[2][columna];
 
-            let dia=datos[2][columna];
+            if (!dia) continue;
 
-            if(!dia) continue;
+            let tipo = "EVALUACIÓN";
+            let oi = actividad;
 
-            let tipo="EVALUACIÓN";
-            let oi=actividad;
+            if (actividad.toUpperCase().startsWith("TEST.")) {
 
-            if(actividad.toUpperCase().startsWith("TEST.")){
+                tipo = "TESTIFICACIÓN";
 
-                tipo="TESTIFICACIÓN";
-
-                oi=actividad.substring(5).trim();
+                oi = actividad.substring(5).trim();
 
             }
 
-            if(actividad.toUpperCase().startsWith("POSIBLE TEST.")){
+            if (actividad.toUpperCase().startsWith("POSIBLE TEST.")) {
 
-                tipo="POSIBLE TESTIFICACIÓN";
+                tipo = "POSIBLE TESTIFICACIÓN";
 
-                oi=actividad.substring(14).trim();
+                oi = actividad.substring(14).trim();
 
             }
 
             baseDatos.push({
 
-                mes:nombreHoja,
+                mes: mes,
 
-                dia:dia,
+                dia: dia,
 
-                evaluador:evaluador,
+                evaluador: evaluador,
 
-                tipo:tipo,
+                tipo: tipo,
 
-                oi:oi
+                oi: oi
 
             });
 
