@@ -1,7 +1,7 @@
-// =========================================
+// ========================================
 // SIPE
 // Buscador
-// =========================================
+// ========================================
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -13,142 +13,98 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function buscar() {
 
-    const mes =
-        document.getElementById("mes").value.toUpperCase();
+    const mes = document
+        .getElementById("mes")
+        .value
+        .trim()
+        .toUpperCase();
 
-    const evaluador =
-        document.getElementById("evaluador").value.toUpperCase();
+    const evaluador = document
+        .getElementById("evaluador")
+        .value
+        .trim()
+        .toUpperCase();
 
-    let resultados = baseDatos.filter(r => {
+    let resultados = baseDatos.filter(registro => {
 
-        const okMes =
-            mes === "" || r.mes.toUpperCase() === mes;
+        const coincideMes =
+            mes === "" ||
+            registro.mes.toUpperCase() === mes;
 
-        const okEvaluador =
+        const coincideEvaluador =
             evaluador === "" ||
-            r.evaluador.toUpperCase().includes(evaluador);
+            registro.evaluador.toUpperCase().includes(evaluador);
 
-        return okMes && okEvaluador;
+        return coincideMes && coincideEvaluador;
 
     });
 
-    pintarTabla(resultados);
+    mostrarResultados(resultados);
 
 }
 
-function pintarTabla(datos){
+function mostrarResultados(resultados) {
 
-    const tbody=document.querySelector("#tablaResultados tbody");
+    const tabla = document.getElementById("tablaResultados");
 
-    tbody.innerHTML="";
+    tabla.innerHTML = "";
 
-    if(datos.length===0){
+    if (resultados.length === 0) {
 
-        tbody.innerHTML=`
-        <tr>
-        <td colspan="6" class="text-center">
-        No existen resultados
-        </td>
-        </tr>
+        tabla.innerHTML = `
+            <tr>
+                <td colspan="4" class="text-center">
+                    No se encontraron resultados
+                </td>
+            </tr>
         `;
 
         return;
 
     }
 
-    datos.forEach((r,i)=>{
+    resultados.forEach(r => {
 
-        tbody.innerHTML+=`
+        tabla.innerHTML += `
+            <tr>
 
-        <tr>
+                <td>${formatearFecha(r)}</td>
 
-        <td>${fecha(r)}</td>
+                <td>${r.evaluador}</td>
 
-        <td>${r.evaluador}</td>
+                <td>${r.oi}</td>
 
-        <td>${r.tipo}</td>
+                <td>${r.tipo}</td>
 
-        <td>${r.oi}</td>
-
-        <td>
-
-        <button
-        class="btn btn-success btn-sm"
-        onclick="verEquipo(${i})">
-
-        👥 Equipo
-
-        </button>
-
-        </td>
-
-        </tr>
-
+            </tr>
         `;
 
     });
 
-    window.resultadosActuales=datos;
-
 }
 
-function fecha(r){
+function formatearFecha(r) {
 
-    const meses={
+    const meses = {
 
-        ENERO:"01",
-        FEBRERO:"02",
-        MARZO:"03",
-        ABRIL:"04",
-        MAYO:"05",
-        JUNIO:"06",
-        JULIO:"07",
-        AGOSTO:"08",
-        SEPTIEMBRE:"09",
-        OCTUBRE:"10",
-        NOVIEMBRE:"11",
-        DICIEMBRE:"12"
+        ENERO: "01",
+        FEBRERO: "02",
+        MARZO: "03",
+        ABRIL: "04",
+        MAYO: "05",
+        JUNIO: "06",
+        JULIO: "07",
+        AGOSTO: "08",
+        SEPTIEMBRE: "09",
+        OCTUBRE: "10",
+        NOVIEMBRE: "11",
+        DICIEMBRE: "12"
 
     };
 
-    return String(r.dia).padStart(2,"0")+"/"+meses[r.mes]+"/2026";
-
-}
-
-function verEquipo(indice){
-
-    const registro=window.resultadosActuales[indice];
-
-    const equipo=baseDatos.filter(r=>
-
-        r.mes===registro.mes &&
-        r.dia===registro.dia &&
-        r.oi===registro.oi
-
-    );
-
-    let texto="";
-
-    equipo.forEach(e=>{
-
-        texto+="• "+e.evaluador+"\n";
-
-    });
-
-    alert(
-
-        "ORGANISMO\n\n"
-
-        +registro.oi+
-
-        "\n\nFECHA\n\n"
-
-        +fecha(registro)+
-
-        "\n\nEQUIPO\n\n"+
-
-        texto
-
-    );
+    return String(r.dia).padStart(2, "0") +
+        "/" +
+        meses[r.mes] +
+        "/2026";
 
 }
